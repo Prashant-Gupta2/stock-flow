@@ -8,26 +8,12 @@ import {
 
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Dashboard from "./pages/Dashboard";
+import Products from './pages/Products';
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./components/DasgboardLayout";
 
-function Dashboard() {
-  return (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Welcome to your StockFlow workspace.</p>
-    </div>
-  );
-}
 
-function Products() {
-  return (
-    <div>
-      <h1>Products</h1>
-      <p>Manage your store inventory here.</p>
-    </div>
-  );
-}
 
 function SettingsPage() {
   return (
