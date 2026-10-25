@@ -1,19 +1,31 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const sequelize = require('./config/db');
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
+
 dotenv.config();
 
+const sequelize = require("./config/db");
+
+const Organization = require("./models/Organization");
+const User = require("./models/User");
+const Product = require("./models/Product");
+
+const authRoutes = require('./routes/authRoutes');
+const productRoutes = require('./routes/productRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const settingsRoutes = require('./routes/settingsRoute');
+
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-const User = require('./models/User');
-const Organization = require('./models/Organization');
-const Product = require('./models/Product');
+app.use(cors());
+app.use(express.json());
 
-app.get("/",(req,res)=>{
-      res.send("stock low API is working")    
-});
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/settings", settingsRoutes);
 
+// Model relationships
 Organization.hasOne(User, {
   foreignKey: "organizationId",
 });
@@ -29,6 +41,16 @@ Organization.hasMany(Product, {
 Product.belongsTo(Organization, {
   foreignKey: "organizationId",
 });
+
+
+app.get("/", (req, res) => {
+  res.send( "StockFlow API is running");
+});
+
+
+
+const PORT = process.env.PORT || 5000;
+
 async function startServer() {
   try {
     await sequelize.authenticate();
@@ -45,4 +67,5 @@ async function startServer() {
     process.exit(1);
   }
 }
+
 startServer();
