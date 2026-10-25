@@ -27,7 +27,7 @@ function Settings() {
 
         setForm({
           organizationName: data.organizationName ?? data.name ?? "",
-          email: data.email ?? "",
+          email: response.data.settings.email ?? "",
           lowStockThreshold: String(data.lowStockThreshold ?? 5),
         });
       } catch (err) {

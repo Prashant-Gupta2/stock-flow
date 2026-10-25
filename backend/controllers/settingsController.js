@@ -1,5 +1,6 @@
 
 const Organization = require("../models/Organization");
+const User = require('../models/User');
 
 // Get organization settings
 exports.getSettings = async (req, res) => {
@@ -7,7 +8,8 @@ exports.getSettings = async (req, res) => {
     const organization = await Organization.findByPk(
       req.user.organizationId
     );
-
+    const user = await User.findOne({where:organization.organizationId});
+    
     if (!organization) {
       return res.status(404).json({
         message: "Organization not found",
@@ -17,6 +19,7 @@ exports.getSettings = async (req, res) => {
     return res.status(200).json({
       settings: {
         organizationName: organization.name,
+        email:user.email,
         defaultLowStockThreshold:
           organization.defaultLowStockThreshold,
       },
