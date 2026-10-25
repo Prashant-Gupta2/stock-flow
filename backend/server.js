@@ -1,6 +1,8 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const halmet = require('helmet');
+const compression = require('compression');
 
 dotenv.config();
 
@@ -18,6 +20,8 @@ const settingsRoutes = require('./routes/settingsRoute');
 const app = express();
 
 app.use(cors());
+app.use(halmet());
+app.use(compression());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
