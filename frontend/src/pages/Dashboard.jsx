@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Package,
   AlertTriangle,
@@ -14,47 +14,42 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        setLoading(true);
-        setError("");
+const fetchDashboard = useCallback(async () => {
+  try {
+    setLoading(true);
+    setError("");
 
-        const response = await api.get("/api/dashboard");
+    const response = await api.get("/api/dashboard");
 
-        // Support common API response formats.
-        const data = response.data?.data ?? response.data;
-        setStats(data);
-      } catch (err) {
-        setError(
-          err.response?.data?.message ||
-            "Unable to load dashboard statistics."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Declare data BEFORE accessing its properties.
+    const responseData = response.data?.data ?? response.data;
+    const summary = responseData?.summary ?? responseData ?? {};
 
-    fetchDashboard();
-  }, []);
+    setStats({
+      ...summary,
+      lowStockProducts:
+        summary.lowStockProducts ??
+        responseData?.lowStockItems?.length ??
+        0,
+    });
+  } catch (err) {
+    console.error("Dashboard API error:", err);
+    console.error("Backend response:", err.response?.data);
+    console.error("Request URL:", err.config?.url);
 
-  if (loading) {
-    return <div className="dashboard-message">Loading dashboard...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="dashboard-message">
-        <p className="error-message">{error}</p>
-        <button
-          className="retry-button"
-          onClick={() => window.location.reload()}
-        >
-          <RefreshCw size={16} /> Retry
-        </button>
-      </div>
+    setError(
+      err.response?.data?.message ||
+        err.message ||
+        "Unable to load dashboard statistics."
     );
+  } finally {
+    setLoading(false);
   }
+}, []);
+
+  useEffect(() => {
+    fetchDashboard();
+  }, [fetchDashboard]);
 
   const cards = [
     {
@@ -83,6 +78,31 @@ function Dashboard() {
     },
   ];
 
+  if (loading) {
+    return (
+      <div className="dashboard-message">
+        Loading dashboard...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard-message">
+        <p className="error-message">{error}</p>
+
+        <button
+          className="retry-button"
+          type="button"
+          onClick={fetchDashboard}
+        >
+          <RefreshCw size={16} />
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   return (
     <section className="dashboard-page">
       <header className="page-header">
@@ -96,15 +116,19 @@ function Dashboard() {
 
         <button
           className="retry-button"
-          onClick={() => window.location.reload()}
+          type="button"
+          onClick={fetchDashboard}
+          disabled={loading}
         >
-          <RefreshCw size={16} /> Refresh
+          <RefreshCw size={16} />
+          Refresh
         </button>
       </header>
 
       <div className="stats-grid">
         {cards.map((card) => {
           const Icon = card.icon;
+          const value = Number(card.value);
 
           return (
             <article className="stat-card" key={card.title}>
@@ -115,7 +139,9 @@ function Dashboard() {
               <div>
                 <p className="stat-title">{card.title}</p>
                 <h2 className="stat-value">
-                  {Number(card.value).toLocaleString()}
+                  {Number.isFinite(value)
+                    ? value.toLocaleString()
+                    : "—"}
                 </h2>
               </div>
             </article>
@@ -131,6 +157,7 @@ function Dashboard() {
             keep track of your store stock.
           </p>
         </div>
+
         <Package size={38} />
       </section>
     </section>

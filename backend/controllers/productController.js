@@ -119,3 +119,96 @@ exports.getProductById = async (req, res) => {
     });
   }
 };
+
+// UPDATE PRODUCT
+exports.updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const {
+      name,
+      sku,
+      description,
+      quantity,
+      costPrice,
+      sellingPrice,
+      lowStockThreshold,
+    } = req.body;
+
+    // Get organization ID from authenticated user
+    const organizationId = req.user.organizationId;
+
+    // Find product belonging to this organization
+    const product = await Product.findOne({
+      where: {
+        id,
+        organizationId,
+      },
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found.",
+      });
+    }
+
+    // Update product fields
+    await product.update({
+      name,
+      sku,
+      description,
+      quantity,
+      costPrice,
+      sellingPrice,
+      lowStockThreshold,
+    });
+
+    return res.status(200).json({
+      message: "Product updated successfully.",
+      product,
+    });
+  } catch (error) {
+    console.error("Update product error:", error);
+
+    return res.status(500).json({
+      message: "Failed to update product.",
+    });
+  }
+};
+
+// DELETE PRODUCT
+ exports.deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Get organization ID from authenticated user
+    const organizationId = req.user.organizationId;
+
+    // Find product belonging to this organization
+    const product = await Product.findOne({
+      where: {
+        id,
+        organizationId,
+      },
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found.",
+      });
+    }
+
+    await product.destroy();
+
+    return res.status(200).json({
+      message: "Product deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Delete product error:", error);
+
+    return res.status(500).json({
+      message: "Failed to delete product.",
+    });
+  }
+};
+

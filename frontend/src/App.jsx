@@ -10,19 +10,10 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Products from './pages/Products';
+import Settings  from "./pages/Settings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./components/DasgboardLayout";
 
-
-
-function SettingsPage() {
-  return (
-    <div>
-      <h1>Organization Settings</h1>
-      <p>Manage your store information here.</p>
-    </div>
-  );
-}
 
 function App() {
   return (
@@ -48,7 +39,7 @@ function App() {
             />
             <Route
               path="/settings"
-              element={<SettingsPage />}
+              element={<Settings />}
             />
           </Route>
         </Route>
