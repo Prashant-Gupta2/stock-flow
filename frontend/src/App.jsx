@@ -14,7 +14,6 @@ import Settings  from "./pages/Settings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./components/DasgboardLayout";
 
-
 function App() {
   return (
     <BrowserRouter>
